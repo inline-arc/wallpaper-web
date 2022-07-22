@@ -1,23 +1,31 @@
-import logo from './logo.svg';
+//import logo from './logo.svg';
 import './App.css';
+import { ref, listAll, getDownloadURL} from "firebase/storage";
+import {useState, useEffect} from "react";
+import {storage} from "./firebase";
 
-function App() {
+ function App() {
+  
+  const fileref = ref(storage, "images/")
+  const [imageurl, setimageurls] = useState([]);
+
+  useEffect(() =>{
+    listAll(fileref).then((response) => {
+      response.items.forEach((items)=>{
+        getDownloadURL(items).then((url) =>{
+          setimageurls((prev) => [...prev , url]);
+        });
+      });
+    });
+  }, [])
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className='App'>
+      <div className='container'>
+      {imageurl.map((url) => {
+        return <img src={url} alt='errors'/>;
+      })}
+    </div>
     </div>
   );
 }
